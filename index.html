@@ -3,76 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Title</title>
+    <title>Document</title>
 </head>
 <body>
 
     <div id="contenedor">
         <h2>Lista de personajes de Star Wars</h2>
-
     </div>
 
     <script>
-        const url = "https://swapi.dev/api/people"
-        const contenedor = document.getElementById("contenedor")
+        const urlBase = "https://swapi.dev/api/people";
+        const contenedor = document.getElementById("contenedor");
 
         const tabla = document.createElement("table");
         const thead = document.createElement("thead");
         const tbody = document.createElement("tbody");
 
-        //thead
-        const trencabezado = document.createElement("tr")
-        const encabezados = ["Nombre", "Altura", "Peso", "Color de cabello", "Genero"];
-        encabezados.forEach((elemento)=>{
+        // Encabezado de tabla
+        const trencabezado = document.createElement("tr");
+        const encabezados = ["Nombre", "Altura", "Peso", "Color de cabello", "Género"];
+        encabezados.forEach((elemento) => {
             const th = document.createElement("th");
             th.textContent = elemento;
-            trencabezado.appendChild(th)
-        })
+            trencabezado.appendChild(th);
+        });
 
-        thead.appendChild(trencabezado)
-        tabla.appendChild(thead)
-        tabla.appendChild(tbody)
-        contenedor.appendChild(tabla)
+        thead.appendChild(trencabezado);
+        tabla.appendChild(thead);
+        tabla.appendChild(tbody);
+        contenedor.appendChild(tabla);
 
-        
+        // Función para traer todos los personajes de todas las páginas
+        const fetchAllCharacters = async (url) => {
+            try {
+                while (url) {
+                    const respuesta = await fetch(url);
+                    const info = await respuesta.json();
 
-        fetch(url)
-        .then(respuesta => respuesta.json())
-        .then(info => {
-            info.results.forEach(pj => {
-                const fila = document.createElement("tr")
+                    info.results.forEach(pj => {
+                        const fila = document.createElement("tr");
 
-                const nombre = document.createElement("td");
-                nombre.textContent = pj.name;
+                        const nombre = document.createElement("td");
+                        nombre.textContent = pj.name;
 
-                const altura = document.createElement("td");
-                altura.textContent = pj.height;
+                        const altura = document.createElement("td");
+                        altura.textContent = pj.height;
 
-                const peso = document.createElement("td");
-                peso.textContent = pj.mass;
+                        const peso = document.createElement("td");
+                        peso.textContent = pj.mass;
 
-                const cabello = document.createElement("td");
-                cabello.textContent = pj.hair_color;
+                        const cabello = document.createElement("td");
+                        cabello.textContent = pj.hair_color;
 
-                const genero = document.createElement("td");
-                genero.textContent = pj.gender;
+                        const genero = document.createElement("td");
+                        genero.textContent = pj.gender;
 
-                fila.appendChild(nombre);
-                fila.appendChild(altura);
-                fila.appendChild(peso);
-                fila.appendChild(cabello);
-                fila.appendChild(genero);
-                
-                tbody.appendChild(fila)
-            })
-        })
-        .catch(er => {
-            const error = document.createElement("h1")
-            error.textContent = "Error al traer datos!!!"
-            tabla.before(error);
-        })
-        
+                        fila.appendChild(nombre);
+                        fila.appendChild(altura);
+                        fila.appendChild(peso);
+                        fila.appendChild(cabello);
+                        fila.appendChild(genero);
 
+                        tbody.appendChild(fila);
+                    });
+
+                    // Cambia a la siguiente página si existe
+                    url = info.next;
+                }
+            } catch (error) {
+                const mensajeError = document.createElement("h1");
+                mensajeError.textContent = "Error al traer datos!!!";
+                tabla.before(mensajeError);
+            }
+        };
+
+        // Llamada inicial
+        fetchAllCharacters(urlBase);
     </script>
 </body>
 </html>
