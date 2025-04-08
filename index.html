@@ -1,30 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+    <title>Star Wars Characters</title>
+    <link rel="icon" href="assets/favicon.png" type="image/png">
 </head>
 <body>
 
-    <div id="contenedor">
-        <h2>Lista de personajes de Star Wars</h2>
-    </div>
+    <div id="contenedor"></div>
 
     <script>
         const urlBase = "https://swapi.dev/api/people";
         const contenedor = document.getElementById("contenedor");
 
+        const titulo = document.createElement("h2");
+        titulo.textContent = "Lista de personajes de Star Wars";
+        titulo.classList.add("mainTitle");
+        contenedor.appendChild(titulo);
+
         const tabla = document.createElement("table");
+        tabla.classList.add("characterTable");
+
         const thead = document.createElement("thead");
         const tbody = document.createElement("tbody");
 
-        // Encabezado de tabla
         const trencabezado = document.createElement("tr");
         const encabezados = ["Nombre", "Altura", "Peso", "Color de cabello", "Género"];
-        encabezados.forEach((elemento) => {
+        encabezados.forEach((texto) => {
             const th = document.createElement("th");
-            th.textContent = elemento;
+            th.textContent = texto;
+            th.classList.add("tableHeader");
             trencabezado.appendChild(th);
         });
 
@@ -33,7 +41,15 @@
         tabla.appendChild(tbody);
         contenedor.appendChild(tabla);
 
-        // Función para traer todos los personajes de todas las páginas
+
+        const genderEmoji = {
+            "male": "👨",
+            "female": "👩",
+            "hermaphrodite": "🧑",
+            "n/a": "🤖",
+            "none": "🌀"
+        };
+
         const fetchAllCharacters = async (url) => {
             try {
                 while (url) {
@@ -42,21 +58,28 @@
 
                     info.results.forEach(pj => {
                         const fila = document.createElement("tr");
+                        fila.classList.add("characterRow");
 
                         const nombre = document.createElement("td");
                         nombre.textContent = pj.name;
+                        nombre.classList.add("nameCell");
 
                         const altura = document.createElement("td");
                         altura.textContent = pj.height;
+                        altura.classList.add("heightCell");
 
                         const peso = document.createElement("td");
                         peso.textContent = pj.mass;
+                        peso.classList.add("massCell");
 
                         const cabello = document.createElement("td");
                         cabello.textContent = pj.hair_color;
+                        cabello.classList.add("hairCell");
 
                         const genero = document.createElement("td");
-                        genero.textContent = pj.gender;
+                        const emoji = genderEmoji[pj.gender] || "❓";
+                        genero.textContent = `${emoji} ${pj.gender}`;
+                        genero.classList.add("genderCell");
 
                         fila.appendChild(nombre);
                         fila.appendChild(altura);
@@ -67,17 +90,55 @@
                         tbody.appendChild(fila);
                     });
 
-                    // Cambia a la siguiente página si existe
                     url = info.next;
                 }
+
+                const estilo = document.createElement("style");
+                estilo.textContent = `
+                    .mainTitle {
+                        font-family: 'Segoe UI', sans-serif;
+                        font-size: 28px;
+                        color: #333;
+                        text-align: center;
+                        margin-top: 20px;
+                    }
+                    .characterTable {
+                        width: 90%;
+                        margin: 20px auto;
+                        border-collapse: collapse;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    .characterTable th,
+                    .characterTable td {
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        text-align: center;
+                    }
+                    .characterTable th {
+                        background-color: #20232a;
+                        color: #61dafb;
+                        font-weight: bold;
+                    }
+                    .characterRow:nth-child(even) {
+                        background-color: #f4f4f4;
+                    }
+                    .characterRow:hover {
+                        background-color: #d0e6ff;
+                    }
+                    .genderCell {
+                        font-size: 18px;
+                    }
+                `;
+                document.head.appendChild(estilo);
+
             } catch (error) {
                 const mensajeError = document.createElement("h1");
                 mensajeError.textContent = "Error al traer datos!!!";
+                mensajeError.classList.add("errorTitle");
                 tabla.before(mensajeError);
             }
         };
 
-        // Llamada inicial
         fetchAllCharacters(urlBase);
     </script>
 </body>
